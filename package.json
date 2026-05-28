@@ -1,0 +1,40 @@
+{
+  "name": "renderguard",
+  "version": "0.0.1",
+  "description": "Baseline-free render-correctness checks for the web. Catches text overflow, clipping, and off-canvas bleed — no screenshots, no baselines.",
+  "type": "module",
+  "bin": {
+    "renderguard": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "check": "tsx src/cli.ts",
+    "demo": "tsx demo/scan.ts",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "render",
+    "overflow",
+    "layout",
+    "qa",
+    "visual-testing",
+    "accessibility",
+    "playwright",
+    "ci"
+  ],
+  "license": "MIT",
+  "author": "xiangnuans",
+  "dependencies": {
+    "playwright": "^1.49.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

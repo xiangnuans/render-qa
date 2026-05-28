@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Horizontal scroll — RenderGuard fixture</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; padding: 40px; }
+      /* A block wider than any normal viewport forces the whole page to
+         scroll sideways — the classic "why is there a horizontal scrollbar" bug. */
+      .too-wide {
+        width: 1600px;
+        height: 60px;
+        background: #fee2e2;
+        line-height: 60px;
+        padding-left: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="too-wide">This fixed-width block is wider than the viewport.</div>
+  </body>
+</html>

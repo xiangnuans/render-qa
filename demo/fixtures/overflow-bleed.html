@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Off-canvas bleed — RenderGuard fixture</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; }
+      /* An absolutely-positioned chip pushed so far right that its text
+         renders partly off the right edge of the viewport. */
+      .chip {
+        position: absolute;
+        top: 40px;
+        left: 1180px;
+        white-space: nowrap;
+        padding: 6px 10px;
+        background: #dcfce7;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chip">Status: completed and synced to the dashboard</div>
+  </body>
+</html>

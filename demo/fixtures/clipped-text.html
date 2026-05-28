@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clipped text — RenderGuard fixture</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; padding: 40px; }
+      /* Fixed width + overflow:hidden + nowrap, but NO ellipsis.
+         The end of the text is silently chopped off — a real bug. */
+      .pill {
+        width: 160px;
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 8px 12px;
+        background: #eef2ff;
+        border-radius: 999px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pill">
+      Generated summary: revenue up 12% quarter over quarter across all regions
+    </div>
+  </body>
+</html>

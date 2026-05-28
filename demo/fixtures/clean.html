@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clean — RenderGuard fixture</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; }
+      .card {
+        max-width: 480px;
+        margin: 40px auto;
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+      }
+      /* Intentional ellipsis truncation — RenderGuard must NOT flag this. */
+      .label {
+        width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: #374151;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Quarterly summary</h1>
+      <p>
+        This paragraph wraps normally inside its container and never spills
+        outside of it, so a correct render has nothing to report here.
+      </p>
+      <div class="label">
+        A deliberately long label that is truncated on purpose with an ellipsis
+      </div>
+    </div>
+  </body>
+</html>

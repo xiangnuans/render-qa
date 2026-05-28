@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+import { checkUrl } from "./check.js";
+import type { CheckResult, Viewport } from "./types.js";
+
+const RED = "\x1b[31m";
+const YELLOW = "\x1b[33m";
+const GREEN = "\x1b[32m";
+const DIM = "\x1b[2m";
+const BOLD = "\x1b[1m";
+const RESET = "\x1b[0m";
+
+function parseViewport(value: string | undefined): Viewport | undefined {
+  if (!value) return undefined;
+  const m = value.match(/^(\d+)x(\d+)$/);
+  if (!m) return undefined;
+  return { width: Number(m[1]), height: Number(m[2]) };
+}
+
+function printHuman(result: CheckResult): void {
+  const errors = result.findings.filter((f) => f.severity === "error");
+  const warnings = result.findings.filter((f) => f.severity === "warning");
+
+  console.log(
+    `\n${BOLD}RenderGuard${RESET} ${DIM}${result.viewport.width}x${result.viewport.height}${RESET}  ${result.url}`,
+  );
+
+  if (result.findings.length === 0) {
+    console.log(`${GREEN}✓ no render issues found${RESET}\n`);
+    return;
+  }
+
+  for (const f of result.findings) {
+    const color = f.severity === "error" ? RED : YELLOW;
+    const tag = f.severity === "error" ? "✗ error" : "▲ warn";
+    console.log(`\n${color}${tag}${RESET} ${BOLD}${f.rule}${RESET}`);
+    console.log(`  ${f.message}`);
+    console.log(`  ${DIM}at${RESET} ${f.selector}`);
+    if (f.snippet) console.log(`  ${DIM}text:${RESET} "${f.snippet}"`);
+  }
+
+  console.log(
+    `\n${errors.length ? RED : GREEN}${errors.length} error(s)${RESET}, ${warnings.length} warning(s)\n`,
+  );
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const cmd = args[0];
+  const target = args[1];
+
+  if (cmd !== "check" || !target || target.startsWith("-")) {
+    console.error(
+      "Usage: renderguard check <url|path> [--json] [--viewport WxH]",
+    );
+    process.exit(2);
+  }
+
+  const json = args.includes("--json");
+  const viewport = parseViewport(args[args.indexOf("--viewport") + 1]);
+
+  const result = await checkUrl(target, { viewport });
+
+  if (json) console.log(JSON.stringify(result, null, 2));
+  else printHuman(result);
+
+  // Non-zero exit on any error-severity finding → fails CI.
+  process.exit(result.ok ? 0 : 1);
+}
+
+main().catch((err) => {
+  console.error(`${RED}renderguard failed:${RESET}`, err?.message ?? err);
+  process.exit(2);
+});
