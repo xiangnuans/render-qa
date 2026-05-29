@@ -22,23 +22,23 @@ async function main(): Promise<void> {
 
   console.log(`\nRenderGuard demo — scanning ${pages.length} pages\n`);
 
-  let broken = 0;
+  let flagged = 0;
   for (const page of pages) {
     const result = await checkUrl(page);
     const name = page.split("/").pop();
-    const errors = result.findings.filter((f) => f.severity === "error");
 
-    if (result.ok) {
+    if (result.findings.length === 0) {
       console.log(`  \x1b[32m✓\x1b[0m ${name} — clean`);
     } else {
-      broken++;
-      const rules = [...new Set(errors.map((f) => f.rule))].join(", ");
-      console.log(`  \x1b[31m✗\x1b[0m ${name} — ${errors.length} issue(s): ${rules}`);
+      flagged++;
+      const rules = [...new Set(result.findings.map((f) => f.rule))].join(", ");
+      const mark = result.ok ? "\x1b[33m▲\x1b[0m" : "\x1b[31m✗\x1b[0m";
+      console.log(`  ${mark} ${name} — ${result.findings.length} issue(s): ${rules}`);
     }
   }
 
   console.log(
-    `\n\x1b[1m${broken} of ${pages.length} pages have render issues.\x1b[0m\n`,
+    `\n\x1b[1m${flagged} of ${pages.length} pages have render issues.\x1b[0m\n`,
   );
 }
 

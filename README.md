@@ -48,8 +48,11 @@ the gate for that class of bug.
 | `clipped-text-vertical` | warning | Text is taller than its clipping box |
 | `viewport-overflow` | error | A text element extends past the right edge of the viewport |
 | `page-horizontal-scroll` | error | The page is wider than the viewport |
+| `low-contrast` | error | Text fails the WCAG AA contrast ratio against its background |
+| `small-tap-target` | warning | An interactive control is smaller than 24×24px |
 
-It does **not** flag intentional `text-overflow: ellipsis` truncation.
+It does **not** flag intentional `text-overflow: ellipsis` truncation, native
+checkbox/radio sizes, or text on a complex/transparent background it can't read.
 
 ## Usage
 
@@ -94,9 +97,10 @@ prints how many have render issues.
 
 ## Roadmap
 
-- [ ] More no-baseline rules: low contrast (WCAG), tiny tap targets, off-screen-left/top
+- [x] No-baseline rules: clipping, viewport overflow, low contrast (WCAG), tiny tap targets
+- [ ] More rules: off-screen (left/top), overlapping text, invisible-on-image text
 - [ ] GitHub Action — annotate the offending elements right on the PR
-- [ ] Hosted GitHub App with a dashboard and history (the paid layer)
+- [ ] Hosted dashboard with history (the paid layer)
 - [ ] Streaming chat-UI checks: stick-to-bottom, no-flicker, tool-render order
 
 ## License

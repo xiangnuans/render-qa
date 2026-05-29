@@ -33,6 +33,17 @@ describe("detectRenderIssues", () => {
     expect(result.ok).toBe(false);
   });
 
+  it("flags text that fails WCAG AA contrast", async () => {
+    const result = await checkUrl(fixture("low-contrast.html"));
+    expect(rulesOf(result.findings)).toContain("low-contrast");
+    expect(result.ok).toBe(false);
+  });
+
+  it("flags an interactive target smaller than 24x24px", async () => {
+    const result = await checkUrl(fixture("tap-target.html"));
+    expect(rulesOf(result.findings)).toContain("small-tap-target");
+  });
+
   it("includes the measured numbers and a selector in each finding", async () => {
     const result = await checkUrl(fixture("clipped-text.html"));
     const clip = result.findings.find((f) => f.rule === "clipped-text");

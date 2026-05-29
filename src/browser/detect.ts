@@ -62,6 +62,51 @@ export function detectRenderIssues(): Finding[] {
     return parts.join(" > ");
   }
 
+  function parseRGB(s: string): [number, number, number, number] | null {
+    const m = s.match(/rgba?\(([^)]+)\)/);
+    if (!m) return null;
+    const p = m[1].split(",").map((x) => parseFloat(x.trim()));
+    if (p.length < 3 || p.some((n) => Number.isNaN(n))) return null;
+    return [p[0], p[1], p[2], p.length >= 4 ? p[3] : 1];
+  }
+
+  function relLuminance(r: number, g: number, b: number): number {
+    const f = (c: number) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+
+  function contrastRatio(l1: number, l2: number): number {
+    const hi = Math.max(l1, l2);
+    const lo = Math.min(l1, l2);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+
+  // Walk up to the first ancestor with a non-transparent background color.
+  function effectiveBg(el: Element): [number, number, number] {
+    let cur: Element | null = el;
+    while (cur) {
+      const c = parseRGB(getComputedStyle(cur).backgroundColor);
+      if (c && c[3] > 0) return [c[0], c[1], c[2]];
+      cur = cur.parentElement;
+    }
+    return [255, 255, 255]; // assume a white page background
+  }
+
+  function isButtonLike(el: Element): boolean {
+    const tag = el.tagName.toLowerCase();
+    if (tag === "button") return true;
+    if (el.getAttribute("role") === "button") return true;
+    if (tag === "input") {
+      const t = (el.getAttribute("type") || "").toLowerCase();
+      // Native checkbox/radio are intentionally small — don't flag those.
+      return t === "button" || t === "submit" || t === "reset";
+    }
+    return false;
+  }
+
   // --- Rule: page-level horizontal scroll -------------------------------
   const doc = document.documentElement;
   if (doc.scrollWidth > vw + tolerance) {
@@ -101,6 +146,23 @@ export function detectRenderIssues(): Finding[] {
           "px past the right edge of the viewport.",
         selector: cssPath(el),
         snippet: text.slice(0, 80),
+        box,
+      });
+    }
+
+    // Rule: interactive target smaller than the 24x24px WCAG 2.2 minimum.
+    if (isButtonLike(el) && (rect.width < 24 || rect.height < 24)) {
+      findings.push({
+        rule: "small-tap-target",
+        severity: "warning",
+        message:
+          "Interactive target is " +
+          Math.round(rect.width) +
+          "x" +
+          Math.round(rect.height) +
+          "px, below the 24x24px minimum.",
+        selector: cssPath(el),
+        snippet: text.slice(0, 80) || undefined,
         box,
       });
     }
@@ -145,6 +207,35 @@ export function detectRenderIssues(): Finding[] {
         snippet: text.slice(0, 80),
         box,
       });
+    }
+
+    // Rule: text fails WCAG AA contrast against its background.
+    const col = parseRGB(style.color);
+    if (col && col[3] >= 0.9) {
+      const fontSize = parseFloat(style.fontSize) || 16;
+      const bold = (parseInt(style.fontWeight, 10) || 400) >= 700;
+      const large = fontSize >= 24 || (fontSize >= 18.66 && bold);
+      const threshold = large ? 3 : 4.5;
+      const bg = effectiveBg(el);
+      const ratio = contrastRatio(
+        relLuminance(col[0], col[1], col[2]),
+        relLuminance(bg[0], bg[1], bg[2]),
+      );
+      if (ratio < threshold - 0.05) {
+        findings.push({
+          rule: "low-contrast",
+          severity: "error",
+          message:
+            "Text contrast is " +
+            ratio.toFixed(2) +
+            ":1, below the WCAG AA minimum of " +
+            threshold +
+            ":1.",
+          selector: cssPath(el),
+          snippet: text.slice(0, 80),
+          box,
+        });
+      }
     }
   }
 
