@@ -92,14 +92,35 @@ npx playwright install chromium
 npm run demo
 ```
 
-Scans `demo/fixtures/` (four pages, three deliberately broken, one clean) and
+Scans `demo/fixtures/` (six pages, five deliberately broken, one clean) and
 prints how many have render issues.
+
+## Use in CI (GitHub Action)
+
+```yaml
+# .github/workflows/render-qa.yml
+on: [pull_request]
+jobs:
+  render-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: xiangnuans/render-qa@v0
+        with:
+          url: https://your-preview-url.example.com
+          viewport: 390x844      # optional, default 1280x800
+          fail-on: error         # or "warning"
+```
+
+Each finding shows up as an annotation on the run, plus a summary table in the
+job. The job fails (non-zero) on an `error` — or on a `warning` too, if you set
+`fail-on: warning`. Full example in [`examples/`](./examples/render-qa.yml).
 
 ## Roadmap
 
 - [x] No-baseline rules: clipping, viewport overflow, low contrast (WCAG), tiny tap targets
+- [x] GitHub Action — annotations + job summary, fails CI on findings
 - [ ] More rules: off-screen (left/top), overlapping text, invisible-on-image text
-- [ ] GitHub Action — annotate the offending elements right on the PR
+- [ ] PR-level review UI that maps findings back to source
 - [ ] Hosted dashboard with history (the paid layer)
 - [ ] Streaming chat-UI checks: stick-to-bottom, no-flicker, tool-render order
 

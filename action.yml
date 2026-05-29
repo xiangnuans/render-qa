@@ -1,0 +1,38 @@
+name: "render-qa"
+description: "Baseline-free render-correctness checks: overflow, clipping, contrast, tap targets."
+branding:
+  icon: "check-square"
+  color: "purple"
+inputs:
+  url:
+    description: "URL or local file path to check."
+    required: true
+  viewport:
+    description: "Viewport as WxH, e.g. 390x844."
+    required: false
+    default: "1280x800"
+  fail-on:
+    description: "Fail the job on 'error' (default) or also on 'warning'."
+    required: false
+    default: "error"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - name: Build render-qa
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci && npm run build
+    - name: Install Chromium
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npx playwright install --with-deps chromium
+    - name: Run render-qa
+      shell: bash
+      run: node "${{ github.action_path }}/action/run.mjs"
+      env:
+        INPUT_URL: ${{ inputs.url }}
+        INPUT_VIEWPORT: ${{ inputs.viewport }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}

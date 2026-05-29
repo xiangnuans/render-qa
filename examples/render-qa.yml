@@ -1,0 +1,20 @@
+# Example: run render-qa on every pull request.
+# Copy this into .github/workflows/ in your own repo.
+#
+# Tip: check a deploy-preview URL (Vercel/Netlify) or a local build you serve
+# in an earlier step, at whatever viewports you care about.
+name: render-qa
+
+on:
+  pull_request:
+
+jobs:
+  render-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the page renders correctly (mobile)
+        uses: xiangnuans/render-qa@v0
+        with:
+          url: https://your-preview-url.example.com
+          viewport: 390x844
+          fail-on: error
