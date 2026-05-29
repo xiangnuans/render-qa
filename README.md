@@ -4,6 +4,7 @@
 clipping, and off-canvas bleed — no screenshots, no baselines, no review queue.
 
 ```bash
+npx playwright install chromium   # once, downloads the headless browser
 npx render-qa check https://your-site.com
 ```
 

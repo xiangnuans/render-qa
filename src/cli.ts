@@ -85,6 +85,17 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error(`${RED}render-qa failed:${RESET}`, err?.message ?? err);
+  const msg = err?.message ?? String(err);
+  // First-run on a clean machine: Chromium isn't downloaded yet. Give an
+  // actionable instruction instead of a cryptic Playwright stack trace.
+  if (/Executable doesn'?t exist|playwright install|browserType\.launch/i.test(msg)) {
+    console.error(
+      `${RED}render-qa: Chromium isn't installed.${RESET}\n` +
+        `Run this once, then re-run your command:\n\n` +
+        `  npx playwright install chromium\n`,
+    );
+    process.exit(2);
+  }
+  console.error(`${RED}render-qa failed:${RESET}`, msg);
   process.exit(2);
 });
