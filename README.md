@@ -1,14 +1,14 @@
-# RenderGuard
+# render-qa
 
 **Baseline-free render-correctness checks for the web.** Catches text overflow,
 clipping, and off-canvas bleed — no screenshots, no baselines, no review queue.
 
 ```bash
-npx renderguard check https://your-site.com
+npx render-qa check https://your-site.com
 ```
 
 ```
-RenderGuard 1280x800  https://your-site.com
+render-qa 1280x800  https://your-site.com
 
 ✗ error clipped-text
   Text is clipped horizontally: content is 412px wide inside a 160px box, with no ellipsis.
@@ -37,7 +37,7 @@ ellipsis, a stray element forcing a horizontal scrollbar — these are bugs you 
 detect from live layout geometry, with **no baseline at all**.
 
 That gap matters more every month: AI now generates UIs, slides, and components by
-the thousand, and a lot of that output silently overflows or clips. RenderGuard is
+the thousand, and a lot of that output silently overflows or clips. render-qa is
 the gate for that class of bug.
 
 ## What it checks today
@@ -58,22 +58,22 @@ checkbox/radio sizes, or text on a complex/transparent background it can't read.
 
 ```bash
 # A live URL
-npx renderguard check https://example.com
+npx render-qa check https://example.com
 
 # A local HTML file
-npx renderguard check ./dist/index.html
+npx render-qa check ./dist/index.html
 
 # A specific viewport (great for catching mobile-only overflow)
-npx renderguard check https://example.com --viewport 390x844
+npx render-qa check https://example.com --viewport 390x844
 
 # Machine-readable output for CI / dashboards
-npx renderguard check https://example.com --json
+npx render-qa check https://example.com --json
 ```
 
 ### Programmatic API
 
 ```ts
-import { checkUrl } from "renderguard";
+import { checkUrl } from "render-qa";
 
 const result = await checkUrl("https://example.com", {
   viewport: { width: 390, height: 844 },

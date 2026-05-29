@@ -20,7 +20,7 @@ async function main(): Promise<void> {
     .filter((f) => f.endsWith(".html"))
     .map((f) => join(fixturesDir, f));
 
-  console.log(`\nRenderGuard demo — scanning ${pages.length} pages\n`);
+  console.log(`\nrender-qa demo — scanning ${pages.length} pages\n`);
 
   let flagged = 0;
   for (const page of pages) {

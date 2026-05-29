@@ -1,10 +1,10 @@
 {
-  "name": "renderguard",
+  "name": "render-qa",
   "version": "0.0.1",
   "description": "Baseline-free render-correctness checks for the web. Catches text overflow, clipping, and off-canvas bleed — no screenshots, no baselines.",
   "type": "module",
   "bin": {
-    "renderguard": "./dist/cli.js"
+    "render-qa": "./dist/cli.js"
   },
   "files": [
     "dist"

@@ -21,7 +21,7 @@ function printHuman(result: CheckResult): void {
   const warnings = result.findings.filter((f) => f.severity === "warning");
 
   console.log(
-    `\n${BOLD}RenderGuard${RESET} ${DIM}${result.viewport.width}x${result.viewport.height}${RESET}  ${result.url}`,
+    `\n${BOLD}render-qa${RESET} ${DIM}${result.viewport.width}x${result.viewport.height}${RESET}  ${result.url}`,
   );
 
   if (result.findings.length === 0) {
@@ -50,7 +50,7 @@ async function main(): Promise<void> {
 
   if (cmd !== "check" || !target || target.startsWith("-")) {
     console.error(
-      "Usage: renderguard check <url|path> [--json] [--viewport WxH]",
+      "Usage: render-qa check <url|path> [--json] [--viewport WxH]",
     );
     process.exit(2);
   }
@@ -68,6 +68,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error(`${RED}renderguard failed:${RESET}`, err?.message ?? err);
+  console.error(`${RED}render-qa failed:${RESET}`, err?.message ?? err);
   process.exit(2);
 });

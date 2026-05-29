@@ -7,7 +7,7 @@ import type { Finding } from "../types.js";
  * variables. All helpers are declared inline so the function source is complete
  * when stringified into the browser context.
  *
- * The whole point of RenderGuard: this answers "is this single render correct?"
+ * The whole point of render-qa: this answers "is this single render correct?"
  * using live layout geometry — NOT "did it change vs a baseline screenshot?".
  */
 export function detectRenderIssues(): Finding[] {
