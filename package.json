@@ -13,6 +13,7 @@
     "build": "tsc",
     "check": "tsx src/cli.ts",
     "demo": "tsx demo/scan.ts",
+    "scan:live": "tsx demo/scan-live.ts",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },

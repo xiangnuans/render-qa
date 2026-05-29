@@ -29,13 +29,30 @@ function printHuman(result: CheckResult): void {
     return;
   }
 
+  // Group by rule so a repeated issue (e.g. low contrast on every row) shows
+  // once with a count instead of hundreds of near-identical lines.
+  const byRule = new Map<string, typeof result.findings>();
   for (const f of result.findings) {
-    const color = f.severity === "error" ? RED : YELLOW;
-    const tag = f.severity === "error" ? "✗ error" : "▲ warn";
-    console.log(`\n${color}${tag}${RESET} ${BOLD}${f.rule}${RESET}`);
-    console.log(`  ${f.message}`);
-    console.log(`  ${DIM}at${RESET} ${f.selector}`);
-    if (f.snippet) console.log(`  ${DIM}text:${RESET} "${f.snippet}"`);
+    const g = byRule.get(f.rule);
+    if (g) g.push(f);
+    else byRule.set(f.rule, [f]);
+  }
+
+  for (const [rule, group] of byRule) {
+    const sev = group[0].severity;
+    const color = sev === "error" ? RED : YELLOW;
+    const tag = sev === "error" ? "✗ error" : "▲ warn";
+    const count = group.length > 1 ? ` ${DIM}(${group.length}×)${RESET}` : "";
+    console.log(`\n${color}${tag}${RESET} ${BOLD}${rule}${RESET}${count}`);
+    for (const f of group.slice(0, 3)) {
+      console.log(`  ${f.message}`);
+      console.log(
+        `  ${DIM}at${RESET} ${f.selector}${f.snippet ? `  ${DIM}—${RESET} "${f.snippet}"` : ""}`,
+      );
+    }
+    if (group.length > 3) {
+      console.log(`  ${DIM}…and ${group.length - 3} more${RESET}`);
+    }
   }
 
   console.log(

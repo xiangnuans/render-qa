@@ -19,22 +19,34 @@ if (m) viewport = { width: Number(m[1]), height: Number(m[2]) };
 
 const result = await checkUrl(url, { viewport });
 
-// Annotations — surface each finding on the run.
+// Group by rule so a repeated issue doesn't emit hundreds of annotations
+// (GitHub caps at ~10 per step anyway).
+const groups = new Map();
 for (const f of result.findings) {
-  const cmd = f.severity === "error" ? "error" : "warning";
-  console.log(`::${cmd} title=render-qa: ${f.rule}::${f.message} (at ${f.selector})`);
+  const g = groups.get(f.rule);
+  if (g) g.push(f);
+  else groups.set(f.rule, [f]);
 }
 
-// Job summary table.
+// Annotations — one per rule.
+for (const [rule, group] of groups) {
+  const f = group[0];
+  const cmd = f.severity === "error" ? "error" : "warning";
+  const count = group.length > 1 ? ` (${group.length} occurrences)` : "";
+  console.log(`::${cmd} title=render-qa: ${rule}${count}::${f.message} (at ${f.selector})`);
+}
+
+// Job summary table — one row per rule with a count + example.
 const lines = [`### render-qa — ${url}`, ""];
 if (result.findings.length === 0) {
   lines.push("✅ No render issues found.");
 } else {
-  lines.push("| severity | rule | where | detail |", "|---|---|---|---|");
-  for (const f of result.findings) {
+  lines.push("| severity | rule | count | example |", "|---|---|---|---|");
+  for (const [rule, group] of groups) {
+    const f = group[0];
     const sev = f.severity === "error" ? "❌ error" : "⚠️ warning";
     const detail = f.message.replace(/\|/g, "\\|");
-    lines.push(`| ${sev} | \`${f.rule}\` | \`${f.selector}\` | ${detail} |`);
+    lines.push(`| ${sev} | \`${rule}\` | ${group.length} | ${detail} |`);
   }
 }
 const summary = lines.join("\n") + "\n";
