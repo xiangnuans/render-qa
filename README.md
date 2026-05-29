@@ -1,7 +1,10 @@
 # render-qa
 
-**Baseline-free render-correctness checks for the web.** Catches text overflow,
-clipping, and off-canvas bleed — no screenshots, no baselines, no review queue.
+**Baseline-free render-correctness checks for the web.** Catch text overflow,
+clipping, off-canvas bleed, low color contrast (WCAG), and tiny tap targets —
+straight from a single render, with no screenshots and no baselines. Runs
+locally or in CI, and it's built for the broken layouts that AI-generated UIs
+produce by the thousand.
 
 ```bash
 npx playwright install chromium   # once, downloads the headless browser
