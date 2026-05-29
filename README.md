@@ -74,6 +74,21 @@ npx render-qa check https://example.com --viewport 390x844
 npx render-qa check https://example.com --json
 ```
 
+### Scanning pages behind a login
+
+Most real apps are behind auth. Capture a logged-in session once with Playwright,
+then point render-qa at it:
+
+```bash
+# 1. Log in once in the window that opens, then close it — saves auth.json
+npx playwright open --save-storage=auth.json https://your-app.com/login
+
+# 2. Scan an authenticated page using that session
+npx render-qa check https://your-app.com/dashboard --storage-state auth.json
+```
+
+For token-based auth, pass a header instead: `--header "Authorization: Bearer <token>"`.
+
 ### Programmatic API
 
 ```ts

@@ -26,6 +26,10 @@ export interface CheckOptions {
   timeout?: number;
   /** Playwright waitUntil (default "networkidle"). */
   waitUntil?: "load" | "domcontentloaded" | "networkidle";
+  /** Path to a Playwright storageState JSON file — scan pages behind a login. */
+  storageState?: string;
+  /** Extra HTTP headers (e.g. an Authorization bearer token). */
+  headers?: Record<string, string>;
 }
 
 export interface CheckResult {

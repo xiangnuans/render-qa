@@ -16,6 +16,13 @@ function parseViewport(value: string | undefined): Viewport | undefined {
   return { width: Number(m[1]), height: Number(m[2]) };
 }
 
+function getFlag(args: string[], name: string): string | undefined {
+  const i = args.indexOf(name);
+  if (i === -1) return undefined;
+  const v = args[i + 1];
+  return v && !v.startsWith("--") ? v : undefined;
+}
+
 function printHuman(result: CheckResult): void {
   const errors = result.findings.filter((f) => f.severity === "error");
   const warnings = result.findings.filter((f) => f.severity === "warning");
@@ -67,15 +74,30 @@ async function main(): Promise<void> {
 
   if (cmd !== "check" || !target || target.startsWith("-")) {
     console.error(
-      "Usage: render-qa check <url|path> [--json] [--viewport WxH]",
+      "Usage: render-qa check <url|path> [--json] [--viewport WxH] [--storage-state auth.json] [--header 'Key: Value']",
     );
     process.exit(2);
   }
 
   const json = args.includes("--json");
-  const viewport = parseViewport(args[args.indexOf("--viewport") + 1]);
+  const viewport = parseViewport(getFlag(args, "--viewport"));
+  const storageState = getFlag(args, "--storage-state");
 
-  const result = await checkUrl(target, { viewport });
+  // --header "Key: Value", repeatable.
+  const headers: Record<string, string> = {};
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--header" && args[i + 1]) {
+      const raw = args[i + 1];
+      const idx = raw.indexOf(":");
+      if (idx > 0) headers[raw.slice(0, idx).trim()] = raw.slice(idx + 1).trim();
+    }
+  }
+
+  const result = await checkUrl(target, {
+    viewport,
+    storageState,
+    headers: Object.keys(headers).length ? headers : undefined,
+  });
 
   if (json) console.log(JSON.stringify(result, null, 2));
   else printHuman(result);

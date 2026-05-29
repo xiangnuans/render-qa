@@ -25,7 +25,14 @@ export async function checkUrl(
 
   const browser = await chromium.launch();
   try {
-    const page = await browser.newPage({ viewport });
+    const context = await browser.newContext({
+      viewport,
+      // A Playwright storageState file (cookies + localStorage) lets us scan
+      // pages behind a login; extraHTTPHeaders covers token-based auth.
+      storageState: options.storageState,
+      extraHTTPHeaders: options.headers,
+    });
+    const page = await context.newPage();
     await page.goto(url, {
       waitUntil: options.waitUntil ?? "networkidle",
       timeout: options.timeout ?? 30_000,
